@@ -14,7 +14,17 @@ public class Business {
 	private String state;
 	private double stars;
 	
+	private double media;
 	
+	
+	public double getMedia() {
+		return media;
+	}
+
+	public void setMedia(double media) {
+		this.media = media;
+	}
+
 	public Business(String businessId, String fullAddress, String active, String categories, String city, int reviewCount,
 			String businessName, String neighborhoods, double latitude, double longitude, String state, double stars) {
 		super();

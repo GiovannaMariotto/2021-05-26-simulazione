@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Review;
@@ -111,5 +114,58 @@ public class YelpDao {
 		}
 	}
 	
+	public List<String> getAllCitta(){
+		String sql = "SELECT  distinct city "
+				+ "FROM reviews r, business b "
+				+ "WHERE b.business_id=r.business_id ORDER BY city";
+		List<String> result = new LinkedList<>();
+		
+	Connection conn = DBConnect.getConnection();
+	try {
+		PreparedStatement st = conn.prepareStatement(sql);
+		ResultSet rs = st.executeQuery();
+		while(rs.next()) {
+			result.add(rs.getString("city"));
+			}
+		rs.close();
+		st.close();
+		conn.close();
+		return result;
+		
+	} catch (SQLException e) {
+		e.printStackTrace();
+		return null;
+	}
 	
+	}
+	
+	
+	
+	public void getMedia(Map<String,Business> idMap, String citta) throws SQLException {
+		String sql = "SELECT  AVG(r.stars) AS 'media', b.business_id "
+				+ "FROM reviews r, business b "
+				+ "WHERE b.business_id=r.business_id AND b.city=? "
+				+ "GROUP by b.business_id ";
+		Connection conn = DBConnect.getConnection();
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1,citta);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				Business b = idMap.get(rs.getString("business_id"));
+				b.setMedia(rs.getDouble("media"));
+				
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		
+		
+	}
+		
+
+
+
 }
