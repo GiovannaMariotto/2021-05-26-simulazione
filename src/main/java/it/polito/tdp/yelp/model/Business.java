@@ -42,6 +42,12 @@ public class Business {
 		this.stars = stars;
 	}
 	
+	
+	public Business(String id) {
+		this.businessId=id;
+	}
+	
+	
 	public String getBusinessId() {
 		return businessId;
 	}

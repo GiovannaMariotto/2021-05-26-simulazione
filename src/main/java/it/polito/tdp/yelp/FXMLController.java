@@ -8,6 +8,9 @@ import java.net.URL;
 import java.time.Year;
 import java.util.ResourceBundle;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
+
+import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -52,17 +55,47 @@ public class FXMLController {
 
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
-    	
+    	this.txtResult.clear();
+    	this.txtResult.appendText("DA FARE!");
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	String citta = this.cmbCitta.getValue();
+    	Year anno ;
+    	try {
+    		anno = this.cmbAnno.getValue();
+    	}catch(NumberFormatException e) {
+    		this.txtResult.clear();
+    		throw new RuntimeException("Error creaGrafo");
+    	}
+    	if(citta==null || anno==null) {
+    		this.txtResult.clear();
+    		this.txtResult.appendText("ERRORE: parametri non selezionati!");
+    	}
+    	String msg = model.creaGrafo(citta,anno);
+    	this.txtResult.appendText(msg);
+    	
+    	
+    	
+    	
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	Business best = model.getLocaleMigliore();
+    	if(best==null) {
+    		this.txtResult.appendText("Mi dispiace, best non trovato");
+    		return;
+    	}
+    	this.txtResult.appendText("Locale Migliore: "+best.getBusinessName()+"\n");
+    	
+    	
+    	
+    	
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
