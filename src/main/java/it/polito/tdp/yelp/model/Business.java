@@ -43,6 +43,11 @@ public class Business {
 	}
 	
 	
+	@Override
+	public String toString() {
+		return businessName+" - "+this.city;
+	}
+
 	public Business(String id) {
 		this.businessId=id;
 	}

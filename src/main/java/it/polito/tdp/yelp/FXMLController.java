@@ -6,10 +6,12 @@ package it.polito.tdp.yelp;
 
 import java.net.URL;
 import java.time.Year;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+import it.polito.tdp.yelp.model.Arco;
 import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
@@ -48,7 +50,7 @@ public class FXMLController {
     private ComboBox<Year> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
-    private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
+    private ComboBox<Business> cmbLocale; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -56,7 +58,27 @@ public class FXMLController {
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
     	this.txtResult.clear();
-    	this.txtResult.appendText("DA FARE!");
+    	if(this.model.getLocaleMigliore()==null) {
+    		this.txtResult.setText("Errore! Locale migliore non trovato!");
+    	}
+    	Business partenza = cmbLocale.getValue();
+    	Business arrivo = model.getLocaleMigliore();
+    	double soglia = Double.parseDouble(this.txtX.getText());
+    	//Aggiungi controlli
+    	
+    	List<Business> percorso = model.percorsoMigliore(partenza, arrivo, soglia);
+    	if(percorso==null) {
+    		this.txtResult.setText("Mi spiace, percorso non trovato!");
+    		return;
+    	}
+    	if(soglia<0) {
+    		this.txtResult.setText("Insira una soglia prima di calcolare il percorso");
+    		return;
+    	}
+    	
+    	this.txtResult.appendText("Percorso migliore:\n"+percorso.toString()+"\n");
+    	
+    	
     }
 
     @FXML
@@ -76,6 +98,7 @@ public class FXMLController {
     	}
     	String msg = model.creaGrafo(citta,anno);
     	this.txtResult.appendText(msg);
+    	cmbLocale.getItems().addAll(model.getVertexSet());
     	
     	
     	
@@ -85,6 +108,7 @@ public class FXMLController {
     @FXML
     void doLocaleMigliore(ActionEvent event) {
     	this.txtResult.clear();
+    
     	Business best = model.getLocaleMigliore();
     	if(best==null) {
     		this.txtResult.appendText("Mi dispiace, best non trovato");
@@ -116,5 +140,6 @@ public class FXMLController {
     	for( int anno = 2005; anno <= 2013; anno++) {
     		this.cmbAnno.getItems().add(Year.of(anno));
     	}
+    	
     }
 }

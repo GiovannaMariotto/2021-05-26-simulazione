@@ -2,6 +2,7 @@ package it.polito.tdp.yelp.model;
 
 import java.sql.SQLException;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,9 @@ public class Model {
 	private Map<String,Business> idMap;
 	private List<Business> vertici;
 	private List<Review> reviews ;
+	
+	//variabili per la ricorsione
+	private List<Business> percorsoBest;
 	
 	
 	public Model() {
@@ -118,6 +122,60 @@ public class Model {
 		}
 		
 		return result;
+		
+	}
+	
+	
+	
+	public List<Business> percorsoMigliore(Business partenza, Business arrivo, double soglia ){
+		
+		this.percorsoBest=null;
+		List<Business> parziale = new ArrayList<Business>();
+		parziale.add(partenza); //parto da livello 1
+		cerca(parziale,1,arrivo,soglia);
+		
+		
+		
+		return this.percorsoBest;
+		
+	}
+	private void cerca(List<Business> parziale, int livello, Business arrivo, double soglia) {
+		
+		
+		//caso terminale:ho trovato l'arrivo;
+		if(parziale.get(parziale.size()-1).equals(arrivo)) { //prima volta che la parziale arriva all'arrivo
+			if(this.percorsoBest==null) { //if I don't have a best --> set best
+				this.percorsoBest=new ArrayList<>(parziale);
+				return;
+			}else if(parziale.size()<this.percorsoBest.size()) {
+				this.percorsoBest=new ArrayList<>(parziale);
+				return;
+			}else {
+				return; //percorso non è migliore: lo ignoro, non aggiorno il best
+			}
+		}
+		
+		//generazione dei percorsi
+		Business ultimo = parziale.get(parziale.size()-1);
+		//cerca i sucessori di 'ultimo'
+		for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(ultimo)) {
+			if(this.grafo.getEdgeWeight(e)>soglia) {
+				//vai: ricorsione 
+				
+				Business prossimo = Graphs.getOppositeVertex(this.grafo, e, ultimo);
+				//controllare ache che la destinazione non sia già in parziale --> evitare loop
+				
+				if(!parziale.contains(prossimo)) {
+					parziale.add(prossimo);
+					cerca(parziale, livello+1,arrivo,soglia);
+					parziale.remove(parziale.size()-1); //backtracking
+					//camino semplice: vertice appare solo una volta
+				}
+				
+			}
+		}
+		
+		 
 		
 	}
 	
